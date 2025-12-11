@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Child Unauthorized Game Spending Statistics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-blue-900 text-white p-6 shadow-lg">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-3xl font-bold mb-2">The Hidden Cost of Gaming</h1>
+            <p class="text-blue-200 text-lg">Statistical analysis of unauthorized spending by children in online games (2023-2025)</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto p-6">
+        
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
+                <div class="text-4xl font-bold text-red-500 mb-2">31%</div>
+                <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Affected Families</div>
+                <p class="text-slate-600 mt-2 text-sm">Of parents report unauthorized purchases by their children.</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
+                <div class="text-4xl font-bold text-emerald-600 mb-2">$170</div>
+                <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Avg. Incident Cost</div>
+                <p class="text-slate-600 mt-2 text-sm">The average amount lost in a single unauthorized "spree".</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
+                <div class="text-4xl font-bold text-blue-600 mb-2">$245M</div>
+                <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Record Fine</div>
+                <p class="text-slate-600 mt-2 text-sm">Paid by Epic Games (Fortnite) to settle FTC allegations.</p>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            
+            <!-- Chart 1: Prevalence -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                <h2 class="text-xl font-bold mb-4 text-slate-800">Prevalence of Unauthorized Spending</h2>
+                <div class="relative h-64 w-full">
+                    <canvas id="prevalenceChart"></canvas>
+                </div>
+                <p class="text-xs text-slate-400 mt-4 text-center">Source: 2024 Parental Surveys</p>
+            </div>
+
+            <!-- Chart 2: Cost Severity -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                <h2 class="text-xl font-bold mb-4 text-slate-800">Financial Impact per Incident</h2>
+                <div class="relative h-64 w-full">
+                    <canvas id="costChart"></canvas>
+                </div>
+                <p class="text-xs text-slate-400 mt-4 text-center">Data indicates 19% of incidents exceed $300</p>
+            </div>
+
+            <!-- Chart 3: Regulatory Landscape -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                <h2 class="text-xl font-bold mb-4 text-slate-800">Major FTC Settlements (In Millions)</h2>
+                <div class="relative h-64 w-full">
+                    <canvas id="settlementChart"></canvas>
+                </div>
+                <p class="text-xs text-slate-400 mt-4 text-center">Fines paid for "Dark Patterns" & unauthorized billing</p>
+            </div>
+
+            <!-- Chart 4: Parental Factors -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                <h2 class="text-xl font-bold mb-4 text-slate-800">Parental Awareness & Reactions</h2>
+                <div class="relative h-64 w-full">
+                    <canvas id="parentalChart"></canvas>
+                </div>
+                <p class="text-xs text-slate-400 mt-4 text-center">Highlights gaps in monitoring and financial education</p>
+            </div>
+        </div>
+
+        <!-- Insights Section -->
+        <div class="bg-slate-800 text-white rounded-xl p-8 shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Key Insights</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-bold text-blue-300 text-lg mb-2">The "Silent" Drain</h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        While the average loss is $170, the danger lies in detection. 
+                        <strong>23% of parents</strong> rarely or never check their child's card activity, 
+                        meaning many small purchases often go unnoticed until they accumulate into a larger sum.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-blue-300 text-lg mb-2">The Refund Gap</h3>
+                    <p class="text-slate-300 leading-relaxed">
+                        Despite consumer protections improving, approximately <strong>60% of parents</strong> 
+                        do not request a refund after an unauthorized charge, often assuming it's their own 
+                        fault or that the process is too difficult.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Common Chart Options
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: { family: "'Inter', sans-serif", size: 12 },
+                        padding: 20
+                    }
+                }
+            }
+        };
+
+        // 1. Prevalence Chart (Pie)
+        const ctxPrevalence = document.getElementById('prevalenceChart').getContext('2d');
+        new Chart(ctxPrevalence, {
+            type: 'doughnut',
+            data: {
+                labels: ['Unauthorized Purchases (31%)', 'No Unauthorized Spend (69%)'],
+                datasets: [{
+                    data: [31, 69],
+                    backgroundColor: ['#ef4444', '#e2e8f0'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                ...commonOptions,
+                cutout: '70%',
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // 2. Cost Severity (Bar)
+        const ctxCost = document.getElementById('costChart').getContext('2d');
+        new Chart(ctxCost, {
+            type: 'bar',
+            data: {
+                labels: ['Average Incident', 'Severe Cases (Top 19%)'],
+                datasets: [{
+                    label: 'Cost in USD',
+                    data: [170, 300],
+                    backgroundColor: ['#3b82f6', '#1e40af'],
+                    borderRadius: 6,
+                    barPercentage: 0.5
+                }]
+            },
+            options: {
+                ...commonOptions,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { borderDash: [5, 5] },
+                        title: { display: true, text: 'Amount ($)' }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 3. Settlements (Horizontal Bar)
+        const ctxSettlement = document.getElementById('settlementChart').getContext('2d');
+        new Chart(ctxSettlement, {
+            type: 'bar',
+            data: {
+                labels: ['Google (2014)', 'Apple (2014)', 'Epic Games (2023)'],
+                datasets: [{
+                    label: 'Settlement Amount (Millions USD)',
+                    data: [19, 32.5, 245],
+                    backgroundColor: ['#94a3b8', '#64748b', '#dc2626'],
+                    borderRadius: 4,
+                    indexAxis: 'y'
+                }]
+            },
+            options: {
+                ...commonOptions,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        grid: { borderDash: [5, 5] },
+                        title: { display: true, text: 'Millions ($)' }
+                    },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 4. Parental Factors (Bar/Mixed)
+        const ctxParental = document.getElementById('parentalChart').getContext('2d');
+        new Chart(ctxParental, {
+            type: 'bar',
+            data: {
+                labels: ['Parents Rarely Check Cards', 'Did Not Request Refund', 'Feel Kids Lack Money Concept'],
+                datasets: [{
+                    label: 'Percentage of Parents (%)',
+                    data: [23, 60, 72],
+                    backgroundColor: ['#f59e0b', '#f97316', '#8b5cf6'],
+                    borderRadius: 6,
+                    barPercentage: 0.6
+                }]
+            },
+            options: {
+                ...commonOptions,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { borderDash: [5, 5] },
+                        title: { display: true, text: 'Percentage (%)' }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

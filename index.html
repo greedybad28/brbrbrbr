@@ -1,121 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Child Unauthorized Game Spending Statistics</title>
+    <title>GameSmart: Family Finance Guard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module">
         import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .sparkle-btn {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            transition: all 0.3s ease;
+        /* Modern Font Stack */
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            background-image: radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
+            background-size: 100% 600px;
+            background-repeat: no-repeat;
+            min-height: 100vh;
         }
-        .sparkle-btn:hover {
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .font-heading {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+        }
+
+        /* New Button Style */
+        .primary-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .primary-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+            box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.6);
+            filter: brightness(1.1);
         }
-        .nav-btn.active {
-            border-bottom: 2px solid #3b82f6;
-            color: #1e3a8a;
-            font-weight: 700;
+
+        .primary-btn:active {
+            transform: translateY(0);
         }
-        .nav-btn {
+
+        /* Navigation Pills */
+        .nav-pill {
             color: #64748b;
-            font-weight: 500;
-            padding-bottom: 0.5rem;
-            transition: all 0.2s;
+            font-weight: 600;
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
         }
-        .nav-btn:hover {
-            color: #3b82f6;
+
+        .nav-pill:hover {
+            color: #4f46e5;
+            background-color: rgba(99, 102, 241, 0.05);
+        }
+
+        .nav-pill.active {
+            background-color: #4f46e5;
+            color: white;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        /* Custom Form Elements */
+        .custom-input {
+            transition: all 0.2s;
+            border: 2px solid #e2e8f0;
+        }
+
+        .custom-input:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        }
+
+        .checkbox-wrapper input:checked+div {
+            background-color: #f0fdfa;
+            border-color: #14b8a6;
+            color: #0f766e;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+
+<body class="text-slate-800 antialiased">
 
     <!-- Header -->
-    <header class="bg-blue-900 text-white p-6 shadow-lg">
-        <div class="max-w-7xl mx-auto">
-            <h1 class="text-3xl font-bold mb-2">The Hidden Cost of Gaming</h1>
-            <p class="text-blue-200 text-lg">Tools & Data for Managing Child Spending</p>
+    <header class="pt-8 pb-12 px-6 text-center text-white">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight drop-shadow-sm">
+                GameSmart <span class="text-indigo-200 font-light">Guard</span>
+            </h1>
+            <p class="text-indigo-100 text-lg max-w-2xl mx-auto font-light leading-relaxed">
+                Empowering parents with data, AI tools, and scripts to manage the hidden costs of modern gaming.
+            </p>
         </div>
     </header>
 
-    <!-- Navigation -->
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 flex gap-8 pt-4">
-            <button onclick="switchTab('refund')" id="btn-refund" class="nav-btn active">1. Refund Assistant</button>
-            <button onclick="switchTab('tips')" id="btn-tips" class="nav-btn">2. Prevention & Tips</button>
-            <button onclick="switchTab('stats')" id="btn-stats" class="nav-btn">3. Statistics & Data</button>
-        </div>
-    </nav>
+    <!-- Floating Navigation -->
+    <div class="sticky top-4 z-50 px-4 mb-10">
+        <nav class="glass-card max-w-fit mx-auto p-1.5 rounded-full flex gap-1 shadow-xl overflow-x-auto">
+            <button onclick="switchTab('refund')" id="btn-refund" class="nav-pill active whitespace-nowrap">Refund
+                AI</button>
+            <button onclick="switchTab('tips')" id="btn-tips" class="nav-pill whitespace-nowrap">Safety Tools</button>
+            <button onclick="switchTab('stats')" id="btn-stats" class="nav-pill whitespace-nowrap">Live Data</button>
+            <button onclick="switchTab('talk')" id="btn-talk" class="nav-pill whitespace-nowrap">Talk Guide</button>
+        </nav>
+    </div>
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto p-6 min-h-screen">
-        
+    <main class="max-w-7xl mx-auto px-6 pb-20">
+
         <!-- PAGE 1: Refund Generator -->
         <section id="page-refund" class="animate-fade-in">
-            <div class="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden max-w-4xl mx-auto">
-                <div class="bg-indigo-50 p-6 border-b border-indigo-100">
-                    <h2 class="text-2xl font-bold text-indigo-900 flex items-center gap-2">
-                        <span>✨</span> AI Refund Letter Writer
-                    </h2>
-                    <p class="text-indigo-700">60% of parents don't ask for refunds. Let AI write a professional, policy-citing letter for you.</p>
+            <div class="glass-card rounded-3xl overflow-hidden max-w-4xl mx-auto">
+                <div class="bg-gradient-to-r from-indigo-50 to-violet-50 p-8 border-b border-indigo-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm text-2xl">
+                            ✨</div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-slate-800">Refund Letter Writer</h2>
+                            <p class="text-slate-500 text-sm mt-1">Don't absorb the cost. Let AI draft a policy-backed
+                                request.</p>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="p-8">
+
+                <div class="p-8 md:p-10">
                     <div class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Platform / Store</label>
-                                <select id="platformInput" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-                                    <option value="Apple App Store">Apple App Store (iOS)</option>
-                                    <option value="Google Play Store">Google Play Store (Android)</option>
-                                    <option value="PlayStation Network">PlayStation Network</option>
-                                    <option value="Xbox / Microsoft">Xbox / Microsoft Store</option>
-                                    <option value="Steam">Steam</option>
-                                    <option value="Epic Games">Epic Games</option>
-                                    <option value="Roblox">Roblox</option>
-                                </select>
+                                <label
+                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Platform</label>
+                                <div class="relative">
+                                    <select id="platformInput"
+                                        class="custom-input w-full p-4 rounded-xl outline-none bg-slate-50 text-slate-700 appearance-none font-medium cursor-pointer hover:bg-white">
+                                        <optgroup label="Mobile">
+                                            <option value="Apple App Store">Apple App Store (iOS)</option>
+                                            <option value="Google Play Store">Google Play Store (Android)</option>
+                                            <option value="Amazon Appstore">Amazon Appstore</option>
+                                        </optgroup>
+                                        <optgroup label="Console">
+                                            <option value="PlayStation Network">PlayStation Network</option>
+                                            <option value="Xbox / Microsoft Store">Xbox / Microsoft Store</option>
+                                            <option value="Nintendo eShop">Nintendo eShop</option>
+                                        </optgroup>
+                                        <optgroup label="PC / Games">
+                                            <option value="Steam">Steam</option>
+                                            <option value="Epic Games">Epic Games (Fortnite)</option>
+                                            <option value="Roblox">Roblox</option>
+                                            <option value="Garena">Garena (Free Fire)</option>
+                                            <option value="BGMI / Krafton">BGMI / Krafton</option>
+                                        </optgroup>
+                                    </select>
+                                    <div
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Game Name</label>
-                                <input type="text" id="gameInput" placeholder="e.g. Fortnite, Roblox" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Game
+                                    Name</label>
+                                <input type="text" id="gameInput" placeholder="e.g. Free Fire, Roblox"
+                                    class="custom-input w-full p-4 rounded-xl outline-none bg-slate-50 font-medium">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Amount Lost</label>
-                                <input type="text" id="amountInput" placeholder="$170.00" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <label
+                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Amount
+                                    (INR)</label>
+                                <input type="text" id="amountInput" placeholder="₹12,000"
+                                    class="custom-input w-full p-4 rounded-xl outline-none bg-slate-50 font-medium">
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Child's Age</label>
-                                <input type="number" id="ageInput" placeholder="8" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <label
+                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">Child's
+                                    Age</label>
+                                <input type="number" id="ageInput" placeholder="8"
+                                    class="custom-input w-full p-4 rounded-xl outline-none bg-slate-50 font-medium">
                             </div>
                         </div>
 
-                        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-100 text-sm text-yellow-800">
-                            <strong>Tip:</strong> Be honest about the age. Policies often favor parents if the child is a minor who cannot legally enter a contract.
+                        <div
+                            class="flex items-start gap-3 bg-amber-50 p-4 rounded-xl border border-amber-100 text-amber-800 text-sm">
+                            <svg class="w-5 h-5 mt-0.5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p><strong>Pro Tip:</strong> Honesty is key. Consumer protection laws specifically shield
+                                parents from unauthorized contracts made by minors.</p>
                         </div>
-                        
-                        <button onclick="generateRefundLetter()" class="sparkle-btn w-full py-4 px-4 rounded-lg text-white font-bold text-lg flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
+
+                        <button onclick="generateRefundLetter()"
+                            class="primary-btn w-full py-4 px-6 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-3">
                             <span>✨</span> Generate Refund Draft
                         </button>
                     </div>
 
-                    <div id="refundOutputContainer" class="hidden mt-8 border-t border-slate-100 pt-6">
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Generated Draft (Copy & Paste)</label>
-                        <textarea id="refundOutput" rows="12" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono text-slate-700 leading-relaxed shadow-inner" readonly></textarea>
-                        <button onclick="copyToClipboard()" class="mt-3 text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                            Copy to Clipboard
-                        </button>
+                    <div id="refundOutputContainer" class="hidden mt-10 animate-fade-in-up">
+                        <div class="flex justify-between items-end mb-3">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide">Generated
+                                Letter</label>
+                            <button onclick="copyToClipboard()"
+                                class="text-sm font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 rounded-lg transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3">
+                                    </path>
+                                </svg>
+                                Copy Text
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <textarea id="refundOutput" rows="12"
+                                class="w-full p-6 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm font-mono text-slate-700 leading-relaxed shadow-inner outline-none focus:border-indigo-300"
+                                readonly></textarea>
+                            <div class="absolute inset-0 pointer-events-none rounded-2xl border-2 border-black/5"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -123,197 +245,510 @@
 
         <!-- PAGE 2: Prevention & Tips -->
         <section id="page-tips" class="hidden animate-fade-in">
-             
+
             <!-- AI Assistant -->
-            <div class="bg-white rounded-xl shadow-md border border-slate-200 p-8 mb-8">
-                <div class="flex flex-col md:flex-row gap-8 items-start">
-                    <div class="flex-1">
-                        <h2 class="text-2xl font-bold text-slate-800 mb-2">🤖 Parental Control Assistant</h2>
-                        <p class="text-slate-600 mb-4">Ask Gemini specifically how to secure your devices. Example: "How do I turn off In-App Purchases on an iPad?"</p>
-                        
-                        <div class="space-y-4">
-                            <textarea id="assistantQuery" rows="3" placeholder="Describe what you need to block..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none"></textarea>
-                            <button onclick="askAssistant()" class="bg-slate-800 hover:bg-slate-900 transition-colors py-3 px-6 rounded-lg text-white font-bold flex items-center gap-2">
-                                <span>✨</span> Get Instructions
+            <div class="glass-card rounded-3xl p-8 mb-8 border-l-8 border-indigo-500">
+                <div class="flex flex-col lg:flex-row gap-8 lg:items-start">
+                    <div class="lg:w-1/3">
+                        <div class="inline-block p-3 bg-indigo-100 rounded-2xl mb-4 text-indigo-600">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2">Parental Control Assistant</h2>
+                        <p class="text-slate-600 leading-relaxed">Ask for specific instructions tailored to your exact
+                            device model.</p>
+                        <p class="text-xs font-semibold text-slate-400 mt-2 uppercase tracking-wide">Try Asking:</p>
+                        <ul class="text-sm text-slate-500 mt-1 space-y-1">
+                            <li>"Turn off purchases on Samsung Galaxy S23"</li>
+                            <li>"Set time limits on iPad Air"</li>
+                        </ul>
+                    </div>
+
+                    <div class="lg:w-2/3 w-full space-y-4">
+                        <div class="relative">
+                            <textarea id="assistantQuery" rows="2"
+                                placeholder="e.g. How do I disable spending on my son's PS5?"
+                                class="custom-input w-full p-4 pr-32 rounded-2xl outline-none resize-none bg-white text-lg"></textarea>
+                            <button onclick="askAssistant()"
+                                class="absolute right-2 top-2 bottom-2 bg-slate-900 hover:bg-black text-white px-6 rounded-xl font-semibold transition-colors flex items-center gap-2">
+                                Ask AI
                             </button>
                         </div>
-                    </div>
-                    <div class="flex-1 w-full">
-                        <div id="assistantOutputContainer" class="hidden h-full bg-slate-50 p-6 rounded-lg border border-slate-200">
-                             <h4 class="font-bold text-sm text-indigo-600 mb-2 uppercase tracking-wider">AI Instructions</h4>
-                            <div id="assistantOutput" class="text-sm text-slate-700 space-y-2 leading-relaxed whitespace-pre-line"></div>
-                        </div>
-                         <!-- Placeholder when empty -->
-                        <div id="assistantPlaceholder" class="h-full bg-slate-50 p-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 text-sm italic">
-                            Instructions will appear here...
+
+                        <div id="assistantOutputContainer" class="hidden">
+                            <div class="bg-indigo-50/50 rounded-2xl p-6 border border-indigo-100">
+                                <div
+                                    class="flex items-center gap-2 mb-3 text-indigo-700 font-bold text-sm uppercase tracking-wide">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                    Instructions
+                                </div>
+                                <div id="assistantOutput"
+                                    class="text-slate-700 leading-relaxed whitespace-pre-line text-sm md:text-base">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Technical Architecture -->
-            <h2 class="text-2xl font-bold text-slate-800 mb-6">3-Layer Defense Strategy</h2>
+            <!-- Interactive Security Checklist -->
+            <div class="glass-card rounded-3xl p-8 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+                        <span
+                            class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-sm">✓</span>
+                        Security Audit
+                    </h3>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">4 Steps to Safety</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label class="checkbox-wrapper cursor-pointer group">
+                        <input type="checkbox" class="sr-only">
+                        <div
+                            class="p-4 rounded-2xl border-2 border-slate-100 hover:border-emerald-200 bg-white transition-all flex items-center justify-between group-hover:shadow-md">
+                            <div>
+                                <span class="block font-bold text-slate-700">Zero Grace Period</span>
+                                <span class="text-xs text-slate-400">Require password "Immediately"</span>
+                            </div>
+                            <div
+                                class="w-6 h-6 rounded-full border-2 border-slate-200 flex items-center justify-center group-hover:border-emerald-400">
+                                <svg class="hidden w-4 h-4 text-emerald-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="checkbox-wrapper cursor-pointer group">
+                        <input type="checkbox" class="sr-only">
+                        <div
+                            class="p-4 rounded-2xl border-2 border-slate-100 hover:border-emerald-200 bg-white transition-all flex items-center justify-between group-hover:shadow-md">
+                            <div>
+                                <span class="block font-bold text-slate-700">Enable "Ask to Buy"</span>
+                                <span class="text-xs text-slate-400">Requests sent to parent phone</span>
+                            </div>
+                            <div
+                                class="w-6 h-6 rounded-full border-2 border-slate-200 flex items-center justify-center group-hover:border-emerald-400">
+                                <svg class="hidden w-4 h-4 text-emerald-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="checkbox-wrapper cursor-pointer group">
+                        <input type="checkbox" class="sr-only">
+                        <div
+                            class="p-4 rounded-2xl border-2 border-slate-100 hover:border-emerald-200 bg-white transition-all flex items-center justify-between group-hover:shadow-md">
+                            <div>
+                                <span class="block font-bold text-slate-700">Unlink Credit Cards</span>
+                                <span class="text-xs text-slate-400">Use Gift Cards only</span>
+                            </div>
+                            <div
+                                class="w-6 h-6 rounded-full border-2 border-slate-200 flex items-center justify-center group-hover:border-emerald-400">
+                                <svg class="hidden w-4 h-4 text-emerald-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="checkbox-wrapper cursor-pointer group">
+                        <input type="checkbox" class="sr-only">
+                        <div
+                            class="p-4 rounded-2xl border-2 border-slate-100 hover:border-emerald-200 bg-white transition-all flex items-center justify-between group-hover:shadow-md">
+                            <div>
+                                <span class="block font-bold text-slate-700">Instant Alerts</span>
+                                <span class="text-xs text-slate-400">SMS for > ₹1 Transactions</span>
+                            </div>
+                            <div
+                                class="w-6 h-6 rounded-full border-2 border-slate-200 flex items-center justify-center group-hover:border-emerald-400">
+                                <svg class="hidden w-4 h-4 text-emerald-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Technical Layers -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                <!-- Layer 1: Device Level -->
-                <div class="bg-white p-6 rounded-xl border-t-4 border-blue-500 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-blue-100 p-2 rounded-lg text-blue-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                        </div>
-                        <h3 class="font-bold text-slate-800">1. OS-Level Friction</h3>
+                <!-- Layer 1 -->
+                <div class="glass-card p-6 rounded-3xl hover:-translate-y-1 transition-transform duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
                     </div>
-                    <ul class="space-y-4 text-sm text-slate-600">
-                        <li class="flex gap-3 items-start">
-                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
-                            <span><strong>"Ask to Buy":</strong> Decouples the request from the purchase. Child requests on their device -> Parent approves on own phone.</span>
-                        </li>
-                        <li class="flex gap-3 items-start">
-                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
-                            <span><strong>Zero Grace Period:</strong> Change settings to require Password/FaceID for <em>every</em> purchase (default is often 15 mins).</span>
-                        </li>
-                    </ul>
+                    <h3 class="font-bold text-lg text-slate-800 mb-2">1. Device Level</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">The first line of defense. Use OS controls like
+                        Screen Time & Family Link to lock the 'wallet' door.</p>
                 </div>
 
-                <!-- Layer 2: Payment Isolation -->
-                <div class="bg-white p-6 rounded-xl border-t-4 border-purple-500 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-purple-100 p-2 rounded-lg text-purple-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                        </div>
-                        <h3 class="font-bold text-slate-800">2. Payment Isolation</h3>
+                <!-- Layer 2 -->
+                <div class="glass-card p-6 rounded-3xl hover:-translate-y-1 transition-transform duration-300">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z">
+                            </path>
+                        </svg>
                     </div>
-                    <ul class="space-y-4 text-sm text-slate-600">
-                        <li class="flex gap-3 items-start">
-                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
-                            <span><strong>Gift Cards Only:</strong> Remove credit cards. Fund accounts only via physical gift cards to create a "hard cap".</span>
-                        </li>
-                        <li class="flex gap-3 items-start">
-                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
-                            <span><strong>No "Saved" Cards:</strong> Disable "One-Tap Buy" in Amazon/Google settings. never save a card on a child's profile.</span>
-                        </li>
-                    </ul>
+                    <h3 class="font-bold text-lg text-slate-800 mb-2">2. Payment Method</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Isolate the funds. Never use a debit card with
+                        your life savings. Use prepaid cards or gift cards only.</p>
                 </div>
 
-                <!-- Layer 3: Behavioral Design -->
-                <div class="bg-white p-6 rounded-xl border-t-4 border-emerald-500 shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-emerald-100 p-2 rounded-lg text-emerald-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                        <h3 class="font-bold text-slate-800">3. Behavioral Alerts</h3>
+                <!-- Layer 3 -->
+                <div class="glass-card p-6 rounded-3xl hover:-translate-y-1 transition-transform duration-300">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                            </path>
+                        </svg>
                     </div>
-                    <ul class="space-y-4 text-sm text-slate-600">
-                        <li class="flex gap-3 items-start">
-                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
-                            <span><strong>Real-Time Push:</strong> Enable immediate bank alerts for <em>any</em> Card Not Present (CNP) transaction > $0.00.</span>
-                        </li>
-                        <li class="flex gap-3 items-start">
-                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
-                            <span><strong>Visual Literacy:</strong> Teach kids that "1000 Gems" = "$10.00" by sticking a physical conversion chart on the device.</span>
-                        </li>
-                    </ul>
+                    <h3 class="font-bold text-lg text-slate-800 mb-2">3. Behavior Alerts</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Catch it early. Instant SMS alerts turn a ₹50,000
+                        disaster into a ₹500 mistake.</p>
                 </div>
             </div>
         </section>
 
         <!-- PAGE 3: Statistics -->
         <section id="page-stats" class="hidden animate-fade-in">
-             <!-- Summary Cards -->
+            <!-- Summary Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
-                    <div class="text-4xl font-bold text-red-500 mb-2">31%</div>
-                    <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Affected Families</div>
-                    <p class="text-slate-600 mt-2 text-sm">Of parents report unauthorized purchases by their children.</p>
+                <div class="glass-card p-6 rounded-3xl text-center relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-400 to-red-500"></div>
+                    <div
+                        class="text-5xl font-extrabold text-rose-500 mb-2 tracking-tight group-hover:scale-110 transition-transform">
+                        31%</div>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Affected Families</div>
+                    <p class="text-slate-500 mt-2 text-sm leading-snug">Families reporting unauthorized game purchases.
+                    </p>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
-                    <div class="text-4xl font-bold text-emerald-600 mb-2">$170</div>
-                    <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Avg. Incident Cost</div>
-                    <p class="text-slate-600 mt-2 text-sm">The average amount lost in a single unauthorized "spree".</p>
+
+                <div class="glass-card p-6 rounded-3xl text-center relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+                    <div
+                        class="text-5xl font-extrabold text-emerald-500 mb-2 tracking-tight group-hover:scale-110 transition-transform">
+                        $170</div>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Avg. Incident Cost</div>
+                    <p class="text-slate-500 mt-2 text-sm leading-snug">Average loss per unauthorized "spending spree".
+                    </p>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
-                    <div class="text-4xl font-bold text-blue-600 mb-2">$245M</div>
-                    <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Record Fine</div>
-                    <p class="text-slate-600 mt-2 text-sm">Paid by Epic Games (Fortnite) to settle FTC allegations.</p>
+
+                <div class="glass-card p-6 rounded-3xl text-center relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
+                    <div
+                        class="text-5xl font-extrabold text-indigo-500 mb-2 tracking-tight group-hover:scale-110 transition-transform">
+                        $245M</div>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Record Fine</div>
+                    <p class="text-slate-500 mt-2 text-sm leading-snug">Paid by Epic Games for "Dark Patterns".</p>
                 </div>
             </div>
 
             <!-- Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                
-                <!-- Chart 1: Prevalence -->
-                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                    <h2 class="text-xl font-bold mb-4 text-slate-800">Prevalence of Unauthorized Spending</h2>
+
+                <!-- Chart 1 -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <h2 class="text-lg font-bold mb-6 text-slate-800 flex items-center gap-2">
+                        <span class="w-2 h-6 rounded-full bg-rose-500"></span>
+                        Prevalence
+                    </h2>
                     <div class="relative h-64 w-full">
                         <canvas id="prevalenceChart"></canvas>
                     </div>
-                    <p class="text-xs text-slate-400 mt-4 text-center">Source: 2024 Parental Surveys</p>
                 </div>
 
-                <!-- Chart 2: Cost Severity -->
-                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                    <h2 class="text-xl font-bold mb-4 text-slate-800">Financial Impact per Incident</h2>
+                <!-- Chart 2 -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <h2 class="text-lg font-bold mb-6 text-slate-800 flex items-center gap-2">
+                        <span class="w-2 h-6 rounded-full bg-indigo-500"></span>
+                        Financial Severity
+                    </h2>
                     <div class="relative h-64 w-full">
                         <canvas id="costChart"></canvas>
                     </div>
-                    <p class="text-xs text-slate-400 mt-4 text-center">Data indicates 19% of incidents exceed $300</p>
                 </div>
 
-                <!-- Chart 3: Regulatory Landscape -->
-                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                    <h2 class="text-xl font-bold mb-4 text-slate-800">Major FTC Settlements (In Millions)</h2>
+                <!-- Chart 3 -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <h2 class="text-lg font-bold mb-6 text-slate-800 flex items-center gap-2">
+                        <span class="w-2 h-6 rounded-full bg-teal-500"></span>
+                        Major Settlements
+                    </h2>
                     <div class="relative h-64 w-full">
                         <canvas id="settlementChart"></canvas>
                     </div>
-                    <p class="text-xs text-slate-400 mt-4 text-center">Fines paid for "Dark Patterns" & unauthorized billing</p>
                 </div>
 
-                <!-- Chart 4: Parental Factors -->
-                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                    <h2 class="text-xl font-bold mb-4 text-slate-800">Parental Awareness & Reactions</h2>
+                <!-- Chart 4 -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <h2 class="text-lg font-bold mb-6 text-slate-800 flex items-center gap-2">
+                        <span class="w-2 h-6 rounded-full bg-amber-500"></span>
+                        Parental Awareness
+                    </h2>
                     <div class="relative h-64 w-full">
                         <canvas id="parentalChart"></canvas>
                     </div>
-                    <p class="text-xs text-slate-400 mt-4 text-center">Highlights gaps in monitoring and financial education</p>
                 </div>
             </div>
 
             <!-- Insights Section -->
-            <div class="bg-slate-800 text-white rounded-xl p-8 shadow-lg">
-                <h2 class="text-2xl font-bold mb-4">Key Insights</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="font-bold text-blue-300 text-lg mb-2">The "Silent" Drain</h3>
-                        <p class="text-slate-300 leading-relaxed">
-                            While the average loss is $170, the danger lies in detection. 
-                            <strong>23% of parents</strong> rarely or never check their child's card activity, 
-                            meaning many small purchases often go unnoticed until they accumulate into a larger sum.
-                        </p>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-blue-300 text-lg mb-2">The Refund Gap</h3>
-                        <p class="text-slate-300 leading-relaxed">
-                            Despite consumer protections improving, approximately <strong>60% of parents</strong> 
-                            do not request a refund after an unauthorized charge, often assuming it's their own 
-                            fault or that the process is too difficult.
-                        </p>
+            <div class="bg-slate-900 text-white rounded-3xl p-10 shadow-2xl relative overflow-hidden">
+                <div
+                    class="absolute top-0 right-0 w-64 h-64 bg-indigo-600 rounded-full blur-3xl opacity-20 -translate-y-1/2 translate-x-1/3">
+                </div>
+                <div class="relative z-10">
+                    <h2 class="text-2xl font-bold mb-8 flex items-center gap-3">
+                        <svg class="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z">
+                            </path>
+                        </svg>
+                        Critical Analysis
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div>
+                            <h3 class="font-bold text-indigo-300 text-lg mb-3">The "Silent" Drain</h3>
+                            <p class="text-slate-300 leading-relaxed opacity-90">
+                                While average loss is $170, the real danger is detection time.
+                                <strong class="text-white border-b-2 border-indigo-500">23% of parents</strong> rarely
+                                check card activity.
+                                Frictionless payments mean money feels invisible to the child.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-rose-300 text-lg mb-3">The Refund Gap</h3>
+                            <p class="text-slate-300 leading-relaxed opacity-90">
+                                Despite protections, <strong class="text-white border-b-2 border-rose-500">60% of
+                                    parents</strong>
+                                absorb the loss without asking for a refund. Companies count on this "shame factor" to
+                                keep revenue.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
+        </section>
+
+        <!-- PAGE 4: Conversation Guide -->
+        <section id="page-talk" class="hidden animate-fade-in pb-12">
+            <!-- Header -->
+            <div class="max-w-4xl mx-auto text-center mb-16">
+                <span
+                    class="inline-block px-4 py-1.5 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs uppercase tracking-wide mb-4">Communication</span>
+                <h2 class="text-4xl font-extrabold text-slate-800 mb-4">Bridging the Gap</h2>
+                <p class="text-slate-600 text-lg max-w-2xl mx-auto">72% of parents feel their kids don't understand
+                    money. Use these scripts to start the conversation.</p>
+            </div>
+
+            <!-- AGE GROUP CARDS -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <!-- Age Group 1 -->
+                <div
+                    class="glass-card rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border-t-4 border-amber-400">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="bg-amber-100 px-4 py-1 rounded-full text-amber-700 font-extrabold text-sm">Age 5-8
+                        </div>
+                        <span class="text-3xl">🧸</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">The "Real Stuff" Talk</h3>
+                    <p class="text-sm text-slate-500 mb-6">Connect digital costs to physical toys.</p>
+                    <div
+                        class="bg-slate-50 p-5 rounded-2xl text-slate-700 italic text-sm leading-relaxed border border-slate-100">
+                        "This skin costs exactly the same as a LEGO set. If we click 'Buy' on this, we are choosing NOT
+                        to buy the toy at the store."
+                    </div>
+                </div>
+
+                <!-- Age Group 2 -->
+                <div
+                    class="glass-card rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border-t-4 border-blue-400">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="bg-blue-100 px-4 py-1 rounded-full text-blue-700 font-extrabold text-sm">Age 9-12
+                        </div>
+                        <span class="text-3xl">💳</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">The Hard Cap</h3>
+                    <p class="text-sm text-slate-500 mb-6">Budgeting and finite resources.</p>
+                    <div
+                        class="bg-slate-50 p-5 rounded-2xl text-slate-700 italic text-sm leading-relaxed border border-slate-100">
+                        "Here is a ₹500 gift card. That is your budget for the month. Once it hits zero, it stays zero
+                        until next month. Spend wisely."
+                    </div>
+                </div>
+
+                <!-- Age Group 3 -->
+                <div
+                    class="glass-card rounded-3xl p-8 hover:shadow-2xl transition-all duration-300 border-t-4 border-indigo-400">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="bg-indigo-100 px-4 py-1 rounded-full text-indigo-700 font-extrabold text-sm">Age 13+
+                        </div>
+                        <span class="text-3xl">🧠</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Dark Patterns</h3>
+                    <p class="text-sm text-slate-500 mb-6">Exposing marketing manipulation.</p>
+                    <div
+                        class="bg-slate-50 p-5 rounded-2xl text-slate-700 italic text-sm leading-relaxed border border-slate-100">
+                        "That timer isn't real. It's designed by a psychologist to make you panic-buy. Don't let them
+                        hack your brain."
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW SECTION: TRUST & TRANSPARENCY -->
+            <div class="glass-card p-8 rounded-3xl mb-16 border-l-8 border-emerald-400 bg-emerald-50/30">
+                <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <span class="text-emerald-500">💡</span> The Golden Rule: Reaction Matters
+                </h3>
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="md:w-1/2">
+                        <p class="text-slate-600 text-lg leading-relaxed mb-4">
+                            Transparency is a two-way street. If a child confesses to a mistake (like accidental
+                            spending) and is met with anger, they learn one dangerous lesson: <strong>"Hiding it is
+                                safer than telling the truth."</strong>
+                        </p>
+                        <p class="font-bold text-emerald-700 text-lg">The "Safe Harbor" Policy:</p>
+                        <p class="text-sm text-slate-500 mt-1 leading-relaxed">Make a deal: "If you come to me
+                            immediately when something goes wrong, you will not be in trouble. We will fix it together.
+                            If you hide it, that's when there are consequences."</p>
+                    </div>
+                    <div class="md:w-1/2 w-full bg-white p-6 rounded-2xl shadow-sm border border-emerald-100">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4 p-2 rounded-lg hover:bg-rose-50 transition-colors">
+                                <span class="text-3xl">🚫</span>
+                                <div>
+                                    <span class="block font-bold text-rose-500">The Panic Cycle (Avoid)</span>
+                                    <span class="text-slate-400 text-sm">Mistake → Yelling → Fear → Secrecy</span>
+                                </div>
+                            </div>
+                            <div class="w-full h-px bg-slate-100"></div>
+                            <div class="flex items-center gap-4 p-2 rounded-lg hover:bg-emerald-50 transition-colors">
+                                <span class="text-3xl">✅</span>
+                                <div>
+                                    <span class="block font-bold text-emerald-600">The Trust Loop (Goal)</span>
+                                    <span class="text-slate-400 text-sm">Mistake → Calm Help → Safety →
+                                        Transparency</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCRIPTED RESPONSES -->
+            <div class="mb-16 max-w-5xl mx-auto">
+                <h3 class="text-2xl font-bold text-slate-800 mb-8 text-center">Scripted Responses</h3>
+                <div class="grid gap-6">
+                    <!-- Script Card -->
+                    <div class="glass-card p-6 rounded-2xl flex flex-col md:flex-row gap-6 items-center">
+                        <div class="md:w-1/3 text-center md:text-left">
+                            <h4 class="font-bold text-rose-500 mb-1">Kid Says:</h4>
+                            <p class="text-xl font-bold text-slate-800">"But everyone else has it!"</p>
+                        </div>
+                        <div class="hidden md:block w-px h-16 bg-slate-200"></div>
+                        <div class="md:w-2/3">
+                            <h4 class="font-bold text-emerald-600 mb-1 text-xs uppercase tracking-wide">You Say:</h4>
+                            <p class="text-slate-600 leading-relaxed">"I get that you want to fit in. But in this
+                                family, we spend money on experiences or things that last, not digital outfits. Let's
+                                find a way you can earn it through gameplay."</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-2xl flex flex-col md:flex-row gap-6 items-center">
+                        <div class="md:w-1/3 text-center md:text-left">
+                            <h4 class="font-bold text-rose-500 mb-1">Kid Says:</h4>
+                            <p class="text-xl font-bold text-slate-800">"It's just ₹80!"</p>
+                        </div>
+                        <div class="hidden md:block w-px h-16 bg-slate-200"></div>
+                        <div class="md:w-2/3">
+                            <h4 class="font-bold text-emerald-600 mb-1 text-xs uppercase tracking-wide">You Say:</h4>
+                            <p class="text-slate-600 leading-relaxed">"₹80 is small once. But ₹80 every day is ₹2,400 a
+                                month. That's a new pair of shoes. We look at the total cost, not just the single
+                                click."</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAMILY CONTRACT -->
+            <div class="bg-gradient-to-br from-slate-900 to-indigo-900 text-white rounded-3xl p-10 shadow-2xl">
+                <div class="text-center mb-10">
+                    <h3 class="text-3xl font-bold mb-2">The Gaming Contract</h3>
+                    <p class="text-indigo-200">Agree to these rules before the console turns on.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                    <div
+                        class="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/10 text-center hover:bg-white/15 transition-colors">
+                        <div class="text-3xl mb-3">🤝</div>
+                        <h4 class="font-bold text-lg mb-2">Ask First</h4>
+                        <p class="text-sm text-indigo-100 opacity-80">"I will always ask in person before clicking Buy,
+                            even if it's my money."</p>
+                    </div>
+                    <div
+                        class="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/10 text-center hover:bg-white/15 transition-colors">
+                        <div class="text-3xl mb-3">🛑</div>
+                        <h4 class="font-bold text-lg mb-2">Hard Cap</h4>
+                        <p class="text-sm text-indigo-100 opacity-80">"Once the monthly budget is gone, it is gone. No
+                            advances."</p>
+                    </div>
+                    <div
+                        class="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/10 text-center hover:bg-white/15 transition-colors">
+                        <div class="text-3xl mb-3">🔓</div>
+                        <h4 class="font-bold text-lg mb-2">No Secrets</h4>
+                        <p class="text-sm text-indigo-100 opacity-80">"I won't hide screens. If I buy by accident, I
+                            will tell you immediately."</p>
+                    </div>
+                </div>
+
+                <!-- Parent Promise -->
+                <div class="bg-emerald-500/20 border border-emerald-500/30 rounded-2xl p-6 text-center">
+                    <h4 class="font-bold text-emerald-300 mb-2 text-lg uppercase tracking-widest text-xs">Parent's
+                        Promise 🛡️</h4>
+                    <p class="text-emerald-50 font-medium italic text-lg">"If you come to me immediately when a mistake
+                        happens, I promise to listen calmly and help you fix it without punishment. We are on the same
+                        team."</p>
+                </div>
+            </div>
+
         </section>
 
     </main>
 
     <script>
         // API Configuration
-        const apiKey = ""; // Provided by execution environment
+        const apiKey = "AIzaSyBFoHIuPhAGSvelY7A5QRqnI7f3gnH8SAU"; // Provided by user
 
         // Tab Switching Logic
-        const pages = ['refund', 'tips', 'stats'];
+        const pages = ['refund', 'tips', 'stats', 'talk'];
         let chartsInitialized = false;
 
         function switchTab(activeTab) {
-            // Hide all pages, show active
             pages.forEach(page => {
                 const el = document.getElementById(`page-${page}`);
                 const btn = document.getElementById(`btn-${page}`);
@@ -326,10 +761,9 @@
                 }
             });
 
-            // If switching to stats, make sure charts are rendered correctly
             if (activeTab === 'stats') {
                 setTimeout(() => {
-                    initCharts(); // Re-render or init if needed
+                    initCharts();
                 }, 100);
             }
         }
@@ -342,7 +776,7 @@
             }
 
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            
+
             const payload = {
                 contents: [{
                     parts: [{ text: prompt }]
@@ -352,25 +786,21 @@
             try {
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.statusText}`);
-                }
+                if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
 
                 const data = await response.json();
                 return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
             } catch (error) {
                 console.error("Gemini API Error:", error);
-                return "Sorry, I encountered an error while processing your request. Please try again.";
+                return "Sorry, I encountered an error. Please try again.";
             }
         }
 
-        // --- AI Feature 1: Refund Letter Generator ---
+        // --- Feature 1: Refund Letter ---
         async function generateRefundLetter() {
             const platform = document.getElementById('platformInput').value;
             const amount = document.getElementById('amountInput').value;
@@ -378,25 +808,25 @@
             const game = document.getElementById('gameInput').value;
 
             if (!amount || !game) {
-                alert("Please enter the amount and game name.");
+                alert("Please enter amount and game name.");
                 return;
             }
 
             const btn = document.querySelector('button[onclick="generateRefundLetter()"]');
             const originalText = btn.innerHTML;
-            btn.innerHTML = `<span class="animate-spin">⌛</span> Generating...`;
+            btn.innerHTML = `<span class="animate-spin">⌛</span> Writing...`;
             btn.disabled = true;
 
-            const prompt = `Write a polite but firm formal refund request letter to the ${platform} support team. 
-            The context is that my ${age}-year-old child made unauthorized purchases in the game "${game}" totaling ${amount} without my consent. 
-            Mention that these were unauthorized minor transactions and cite standard consumer protection policies for accidental digital purchases by minors. 
-            Keep it professional and ready to copy-paste. Do not include placeholders like [Your Name] in the body unless necessary, but sign it generally as "A Concerned Parent".`;
+            const prompt = `Write a polite but firm formal refund request letter to ${platform} support. 
+            Context: My ${age}-year-old child made unauthorized purchases in "${game}" totaling ${amount}. 
+            Currency: INR. Mention unauthorized minor transactions and cite consumer protection policies. 
+            Sign as "A Concerned Parent". No placeholders.`;
 
             const result = await callGemini(prompt);
 
             document.getElementById('refundOutput').value = result;
             document.getElementById('refundOutputContainer').classList.remove('hidden');
-            
+
             btn.innerHTML = originalText;
             btn.disabled = false;
         }
@@ -404,50 +834,50 @@
         function copyToClipboard() {
             const copyText = document.getElementById("refundOutput");
             copyText.select();
-            copyText.setSelectionRange(0, 99999); 
+            copyText.setSelectionRange(0, 99999);
             document.execCommand("copy");
-            alert("Draft copied to clipboard!");
+            alert("Copied to clipboard!");
         }
 
-        // --- AI Feature 2: Parental Control Assistant ---
+        // --- Feature 2: Assistant ---
         async function askAssistant() {
             const query = document.getElementById('assistantQuery').value;
-
-            if (!query) {
-                alert("Please describe what you need help with.");
-                return;
-            }
+            if (!query) { alert("Please enter a question."); return; }
 
             const btn = document.querySelector('button[onclick="askAssistant()"]');
             const originalText = btn.innerHTML;
-            btn.innerHTML = `<span class="animate-spin">⌛</span> Thinking...`;
+            btn.innerHTML = `Thinking...`;
             btn.disabled = true;
 
-            // Show container, hide placeholder
             document.getElementById('assistantOutputContainer').classList.remove('hidden');
-            document.getElementById('assistantPlaceholder').classList.add('hidden');
-            document.getElementById('assistantOutput').innerText = "Generating instructions specifically for your query...";
+            document.getElementById('assistantOutput').innerText = "Analyzing device settings...";
 
-            const prompt = `You are an expert on digital parenting and online game safety. 
-            The user asks: "${query}". 
-            Provide clear, step-by-step instructions. If the user asks about a specific device (like iPhone, Android, Xbox, PS5), give specific menu paths (e.g., Settings > Screen Time). 
-            Keep the tone helpful and reassuring. Keep the response concise (under 150 words if possible).`;
+            const prompt = `You are a digital parenting expert. User asks: "${query}". 
+            Provide clear, step-by-step instructions (e.g. Settings > Screen Time). Keep it under 150 words.`;
 
             const result = await callGemini(prompt);
-
             document.getElementById('assistantOutput').innerText = result;
-            
+
             btn.innerHTML = originalText;
             btn.disabled = false;
         }
 
-        // --- Chart.js Initialization ---
+        // --- Charts ---
         let charts = {};
 
         function initCharts() {
-            if (chartsInitialized) return; // Prevent double init
-            
-            // Common Chart Options
+            if (chartsInitialized) return;
+
+            // New Vibrant Colors
+            const colors = {
+                rose: '#f43f5e',
+                indigo: '#6366f1',
+                teal: '#14b8a6',
+                amber: '#f59e0b',
+                slate: '#e2e8f0',
+                text: '#475569'
+            };
+
             const commonOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -455,122 +885,92 @@
                     legend: {
                         position: 'bottom',
                         labels: {
-                            font: { family: "'Inter', sans-serif", size: 12 },
-                            padding: 20
+                            font: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
+                            padding: 20,
+                            color: colors.text
                         }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: {
+                        grid: { borderDash: [5, 5], color: '#f1f5f9' },
+                        ticks: { color: colors.text }
                     }
                 }
             };
 
-            // 1. Prevalence Chart (Pie)
-            const ctxPrevalence = document.getElementById('prevalenceChart').getContext('2d');
-            charts.prevalence = new Chart(ctxPrevalence, {
+            // 1. Prevalence (Doughnut)
+            charts.prevalence = new Chart(document.getElementById('prevalenceChart').getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['Unauthorized Purchases (31%)', 'No Unauthorized Spend (69%)'],
+                    labels: ['Unauthorized (31%)', 'Safe (69%)'],
                     datasets: [{
                         data: [31, 69],
-                        backgroundColor: ['#ef4444', '#e2e8f0'],
+                        backgroundColor: [colors.rose, colors.slate],
                         borderWidth: 0,
-                        hoverOffset: 4
+                        hoverOffset: 10
                     }]
                 },
                 options: {
                     ...commonOptions,
-                    cutout: '70%',
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    }
+                    cutout: '75%',
+                    plugins: { legend: { position: 'bottom' } }
                 }
             });
 
-            // 2. Cost Severity (Bar)
-            const ctxCost = document.getElementById('costChart').getContext('2d');
-            charts.cost = new Chart(ctxCost, {
+            // 2. Cost (Bar)
+            charts.cost = new Chart(document.getElementById('costChart').getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: ['Average Incident', 'Severe Cases (Top 19%)'],
+                    labels: ['Avg. Incident', 'Severe Cases'],
                     datasets: [{
-                        label: 'Cost in USD',
+                        label: 'Cost (USD)',
                         data: [170, 300],
-                        backgroundColor: ['#3b82f6', '#1e40af'],
-                        borderRadius: 6,
-                        barPercentage: 0.5
+                        backgroundColor: [colors.indigo, colors.rose],
+                        borderRadius: 12,
+                        barThickness: 40
                     }]
                 },
-                options: {
-                    ...commonOptions,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { borderDash: [5, 5] },
-                            title: { display: true, text: 'Amount ($)' }
-                        },
-                        x: { grid: { display: false } }
-                    }
-                }
+                options: { ...commonOptions, plugins: { legend: { display: false } } }
             });
 
-            // 3. Settlements (Horizontal Bar)
-            const ctxSettlement = document.getElementById('settlementChart').getContext('2d');
-            charts.settlement = new Chart(ctxSettlement, {
+            // 3. Settlements (Bar)
+            charts.settlement = new Chart(document.getElementById('settlementChart').getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: ['Google (2014)', 'Apple (2014)', 'Epic Games (2023)'],
+                    labels: ['Google', 'Apple', 'Epic Games'],
                     datasets: [{
-                        label: 'Settlement Amount (Millions USD)',
+                        label: 'Millions (USD)',
                         data: [19, 32.5, 245],
-                        backgroundColor: ['#94a3b8', '#64748b', '#dc2626'],
-                        borderRadius: 4,
-                        indexAxis: 'y'
+                        backgroundColor: [colors.slate, colors.slate, colors.teal],
+                        borderRadius: 8,
+                        indexAxis: 'y',
+                        barThickness: 20
                     }]
                 },
-                options: {
-                    ...commonOptions,
-                    indexAxis: 'y',
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: {
-                            grid: { borderDash: [5, 5] },
-                            title: { display: true, text: 'Millions ($)' }
-                        },
-                        y: { grid: { display: false } }
-                    }
-                }
+                options: { ...commonOptions, indexAxis: 'y', plugins: { legend: { display: false } } }
             });
 
-            // 4. Parental Factors (Bar/Mixed)
-            const ctxParental = document.getElementById('parentalChart').getContext('2d');
-            charts.parental = new Chart(ctxParental, {
+            // 4. Parental Factors (Bar)
+            charts.parental = new Chart(document.getElementById('parentalChart').getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: ['Parents Rarely Check Cards', 'Did Not Request Refund', 'Feel Kids Lack Money Concept'],
+                    labels: ['Rarely Check', 'No Refund', 'Knowledge Gap'],
                     datasets: [{
-                        label: 'Percentage of Parents (%)',
+                        label: 'Percentage',
                         data: [23, 60, 72],
-                        backgroundColor: ['#f59e0b', '#f97316', '#8b5cf6'],
-                        borderRadius: 6,
-                        barPercentage: 0.6
+                        backgroundColor: [colors.amber, colors.rose, colors.indigo],
+                        borderRadius: 12,
+                        barThickness: 30
                     }]
                 },
-                options: {
-                    ...commonOptions,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: { borderDash: [5, 5] },
-                            title: { display: true, text: 'Percentage (%)' }
-                        },
-                        x: { grid: { display: false } }
-                    }
-                }
+                options: { ...commonOptions, plugins: { legend: { display: false } } }
             });
 
             chartsInitialized = true;
         }
     </script>
 </body>
+
 </html>

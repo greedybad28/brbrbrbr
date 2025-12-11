@@ -6,9 +6,34 @@
     <title>Child Unauthorized Game Spending Statistics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        .sparkle-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            transition: all 0.3s ease;
+        }
+        .sparkle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+        }
+        .nav-btn.active {
+            border-bottom: 2px solid #3b82f6;
+            color: #1e3a8a;
+            font-weight: 700;
+        }
+        .nav-btn {
+            color: #64748b;
+            font-weight: 500;
+            padding-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+        .nav-btn:hover {
+            color: #3b82f6;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -17,219 +42,535 @@
     <header class="bg-blue-900 text-white p-6 shadow-lg">
         <div class="max-w-7xl mx-auto">
             <h1 class="text-3xl font-bold mb-2">The Hidden Cost of Gaming</h1>
-            <p class="text-blue-200 text-lg">Statistical analysis of unauthorized spending by children in online games (2023-2025)</p>
+            <p class="text-blue-200 text-lg">Tools & Data for Managing Child Spending</p>
         </div>
     </header>
 
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 flex gap-8 pt-4">
+            <button onclick="switchTab('refund')" id="btn-refund" class="nav-btn active">1. Refund Assistant</button>
+            <button onclick="switchTab('tips')" id="btn-tips" class="nav-btn">2. Prevention & Tips</button>
+            <button onclick="switchTab('stats')" id="btn-stats" class="nav-btn">3. Statistics & Data</button>
+        </div>
+    </nav>
+
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto p-6">
+    <main class="max-w-7xl mx-auto p-6 min-h-screen">
         
-        <!-- Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
-                <div class="text-4xl font-bold text-red-500 mb-2">31%</div>
-                <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Affected Families</div>
-                <p class="text-slate-600 mt-2 text-sm">Of parents report unauthorized purchases by their children.</p>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
-                <div class="text-4xl font-bold text-emerald-600 mb-2">$170</div>
-                <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Avg. Incident Cost</div>
-                <p class="text-slate-600 mt-2 text-sm">The average amount lost in a single unauthorized "spree".</p>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
-                <div class="text-4xl font-bold text-blue-600 mb-2">$245M</div>
-                <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Record Fine</div>
-                <p class="text-slate-600 mt-2 text-sm">Paid by Epic Games (Fortnite) to settle FTC allegations.</p>
-            </div>
-        </div>
+        <!-- PAGE 1: Refund Generator -->
+        <section id="page-refund" class="animate-fade-in">
+            <div class="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden max-w-4xl mx-auto">
+                <div class="bg-indigo-50 p-6 border-b border-indigo-100">
+                    <h2 class="text-2xl font-bold text-indigo-900 flex items-center gap-2">
+                        <span>✨</span> AI Refund Letter Writer
+                    </h2>
+                    <p class="text-indigo-700">60% of parents don't ask for refunds. Let AI write a professional, policy-citing letter for you.</p>
+                </div>
+                
+                <div class="p-8">
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Platform / Store</label>
+                                <select id="platformInput" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="Apple App Store">Apple App Store (iOS)</option>
+                                    <option value="Google Play Store">Google Play Store (Android)</option>
+                                    <option value="PlayStation Network">PlayStation Network</option>
+                                    <option value="Xbox / Microsoft">Xbox / Microsoft Store</option>
+                                    <option value="Steam">Steam</option>
+                                    <option value="Epic Games">Epic Games</option>
+                                    <option value="Roblox">Roblox</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Game Name</label>
+                                <input type="text" id="gameInput" placeholder="e.g. Fortnite, Roblox" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                        </div>
 
-        <!-- Charts Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            
-            <!-- Chart 1: Prevalence -->
-            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                <h2 class="text-xl font-bold mb-4 text-slate-800">Prevalence of Unauthorized Spending</h2>
-                <div class="relative h-64 w-full">
-                    <canvas id="prevalenceChart"></canvas>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Amount Lost</label>
+                                <input type="text" id="amountInput" placeholder="$170.00" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Child's Age</label>
+                                <input type="number" id="ageInput" placeholder="8" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </div>
+                        </div>
+
+                        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-100 text-sm text-yellow-800">
+                            <strong>Tip:</strong> Be honest about the age. Policies often favor parents if the child is a minor who cannot legally enter a contract.
+                        </div>
+                        
+                        <button onclick="generateRefundLetter()" class="sparkle-btn w-full py-4 px-4 rounded-lg text-white font-bold text-lg flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
+                            <span>✨</span> Generate Refund Draft
+                        </button>
+                    </div>
+
+                    <div id="refundOutputContainer" class="hidden mt-8 border-t border-slate-100 pt-6">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Generated Draft (Copy & Paste)</label>
+                        <textarea id="refundOutput" rows="12" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm font-mono text-slate-700 leading-relaxed shadow-inner" readonly></textarea>
+                        <button onclick="copyToClipboard()" class="mt-3 text-sm font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                            Copy to Clipboard
+                        </button>
+                    </div>
                 </div>
-                <p class="text-xs text-slate-400 mt-4 text-center">Source: 2024 Parental Surveys</p>
+            </div>
+        </section>
+
+        <!-- PAGE 2: Prevention & Tips -->
+        <section id="page-tips" class="hidden animate-fade-in">
+             
+            <!-- AI Assistant -->
+            <div class="bg-white rounded-xl shadow-md border border-slate-200 p-8 mb-8">
+                <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="flex-1">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2">🤖 Parental Control Assistant</h2>
+                        <p class="text-slate-600 mb-4">Ask Gemini specifically how to secure your devices. Example: "How do I turn off In-App Purchases on an iPad?"</p>
+                        
+                        <div class="space-y-4">
+                            <textarea id="assistantQuery" rows="3" placeholder="Describe what you need to block..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none"></textarea>
+                            <button onclick="askAssistant()" class="bg-slate-800 hover:bg-slate-900 transition-colors py-3 px-6 rounded-lg text-white font-bold flex items-center gap-2">
+                                <span>✨</span> Get Instructions
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex-1 w-full">
+                        <div id="assistantOutputContainer" class="hidden h-full bg-slate-50 p-6 rounded-lg border border-slate-200">
+                             <h4 class="font-bold text-sm text-indigo-600 mb-2 uppercase tracking-wider">AI Instructions</h4>
+                            <div id="assistantOutput" class="text-sm text-slate-700 space-y-2 leading-relaxed whitespace-pre-line"></div>
+                        </div>
+                         <!-- Placeholder when empty -->
+                        <div id="assistantPlaceholder" class="h-full bg-slate-50 p-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 text-sm italic">
+                            Instructions will appear here...
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Chart 2: Cost Severity -->
-            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                <h2 class="text-xl font-bold mb-4 text-slate-800">Financial Impact per Incident</h2>
-                <div class="relative h-64 w-full">
-                    <canvas id="costChart"></canvas>
+            <!-- Technical Architecture -->
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">3-Layer Defense Strategy</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Layer 1: Device Level -->
+                <div class="bg-white p-6 rounded-xl border-t-4 border-blue-500 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-blue-100 p-2 rounded-lg text-blue-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-slate-800">1. OS-Level Friction</h3>
+                    </div>
+                    <ul class="space-y-4 text-sm text-slate-600">
+                        <li class="flex gap-3 items-start">
+                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
+                            <span><strong>"Ask to Buy":</strong> Decouples the request from the purchase. Child requests on their device -> Parent approves on own phone.</span>
+                        </li>
+                        <li class="flex gap-3 items-start">
+                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
+                            <span><strong>Zero Grace Period:</strong> Change settings to require Password/FaceID for <em>every</em> purchase (default is often 15 mins).</span>
+                        </li>
+                    </ul>
                 </div>
-                <p class="text-xs text-slate-400 mt-4 text-center">Data indicates 19% of incidents exceed $300</p>
+
+                <!-- Layer 2: Payment Isolation -->
+                <div class="bg-white p-6 rounded-xl border-t-4 border-purple-500 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-purple-100 p-2 rounded-lg text-purple-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-slate-800">2. Payment Isolation</h3>
+                    </div>
+                    <ul class="space-y-4 text-sm text-slate-600">
+                        <li class="flex gap-3 items-start">
+                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
+                            <span><strong>Gift Cards Only:</strong> Remove credit cards. Fund accounts only via physical gift cards to create a "hard cap".</span>
+                        </li>
+                        <li class="flex gap-3 items-start">
+                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
+                            <span><strong>No "Saved" Cards:</strong> Disable "One-Tap Buy" in Amazon/Google settings. never save a card on a child's profile.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Layer 3: Behavioral Design -->
+                <div class="bg-white p-6 rounded-xl border-t-4 border-emerald-500 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-emerald-100 p-2 rounded-lg text-emerald-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="font-bold text-slate-800">3. Behavioral Alerts</h3>
+                    </div>
+                    <ul class="space-y-4 text-sm text-slate-600">
+                        <li class="flex gap-3 items-start">
+                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
+                            <span><strong>Real-Time Push:</strong> Enable immediate bank alerts for <em>any</em> Card Not Present (CNP) transaction > $0.00.</span>
+                        </li>
+                        <li class="flex gap-3 items-start">
+                            <span class="text-green-500 font-bold bg-green-50 rounded-full px-2 py-0.5">✓</span>
+                            <span><strong>Visual Literacy:</strong> Teach kids that "1000 Gems" = "$10.00" by sticking a physical conversion chart on the device.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAGE 3: Statistics -->
+        <section id="page-stats" class="hidden animate-fade-in">
+             <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
+                    <div class="text-4xl font-bold text-red-500 mb-2">31%</div>
+                    <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Affected Families</div>
+                    <p class="text-slate-600 mt-2 text-sm">Of parents report unauthorized purchases by their children.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
+                    <div class="text-4xl font-bold text-emerald-600 mb-2">$170</div>
+                    <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Avg. Incident Cost</div>
+                    <p class="text-slate-600 mt-2 text-sm">The average amount lost in a single unauthorized "spree".</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center text-center">
+                    <div class="text-4xl font-bold text-blue-600 mb-2">$245M</div>
+                    <div class="text-sm text-slate-500 uppercase tracking-wide font-semibold">Record Fine</div>
+                    <p class="text-slate-600 mt-2 text-sm">Paid by Epic Games (Fortnite) to settle FTC allegations.</p>
+                </div>
             </div>
 
-            <!-- Chart 3: Regulatory Landscape -->
-            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                <h2 class="text-xl font-bold mb-4 text-slate-800">Major FTC Settlements (In Millions)</h2>
-                <div class="relative h-64 w-full">
-                    <canvas id="settlementChart"></canvas>
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                
+                <!-- Chart 1: Prevalence -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <h2 class="text-xl font-bold mb-4 text-slate-800">Prevalence of Unauthorized Spending</h2>
+                    <div class="relative h-64 w-full">
+                        <canvas id="prevalenceChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-4 text-center">Source: 2024 Parental Surveys</p>
                 </div>
-                <p class="text-xs text-slate-400 mt-4 text-center">Fines paid for "Dark Patterns" & unauthorized billing</p>
+
+                <!-- Chart 2: Cost Severity -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <h2 class="text-xl font-bold mb-4 text-slate-800">Financial Impact per Incident</h2>
+                    <div class="relative h-64 w-full">
+                        <canvas id="costChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-4 text-center">Data indicates 19% of incidents exceed $300</p>
+                </div>
+
+                <!-- Chart 3: Regulatory Landscape -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <h2 class="text-xl font-bold mb-4 text-slate-800">Major FTC Settlements (In Millions)</h2>
+                    <div class="relative h-64 w-full">
+                        <canvas id="settlementChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-4 text-center">Fines paid for "Dark Patterns" & unauthorized billing</p>
+                </div>
+
+                <!-- Chart 4: Parental Factors -->
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <h2 class="text-xl font-bold mb-4 text-slate-800">Parental Awareness & Reactions</h2>
+                    <div class="relative h-64 w-full">
+                        <canvas id="parentalChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-4 text-center">Highlights gaps in monitoring and financial education</p>
+                </div>
             </div>
 
-            <!-- Chart 4: Parental Factors -->
-            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
-                <h2 class="text-xl font-bold mb-4 text-slate-800">Parental Awareness & Reactions</h2>
-                <div class="relative h-64 w-full">
-                    <canvas id="parentalChart"></canvas>
-                </div>
-                <p class="text-xs text-slate-400 mt-4 text-center">Highlights gaps in monitoring and financial education</p>
-            </div>
-        </div>
-
-        <!-- Insights Section -->
-        <div class="bg-slate-800 text-white rounded-xl p-8 shadow-lg">
-            <h2 class="text-2xl font-bold mb-4">Key Insights</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <h3 class="font-bold text-blue-300 text-lg mb-2">The "Silent" Drain</h3>
-                    <p class="text-slate-300 leading-relaxed">
-                        While the average loss is $170, the danger lies in detection. 
-                        <strong>23% of parents</strong> rarely or never check their child's card activity, 
-                        meaning many small purchases often go unnoticed until they accumulate into a larger sum.
-                    </p>
-                </div>
-                <div>
-                    <h3 class="font-bold text-blue-300 text-lg mb-2">The Refund Gap</h3>
-                    <p class="text-slate-300 leading-relaxed">
-                        Despite consumer protections improving, approximately <strong>60% of parents</strong> 
-                        do not request a refund after an unauthorized charge, often assuming it's their own 
-                        fault or that the process is too difficult.
-                    </p>
+            <!-- Insights Section -->
+            <div class="bg-slate-800 text-white rounded-xl p-8 shadow-lg">
+                <h2 class="text-2xl font-bold mb-4">Key Insights</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-bold text-blue-300 text-lg mb-2">The "Silent" Drain</h3>
+                        <p class="text-slate-300 leading-relaxed">
+                            While the average loss is $170, the danger lies in detection. 
+                            <strong>23% of parents</strong> rarely or never check their child's card activity, 
+                            meaning many small purchases often go unnoticed until they accumulate into a larger sum.
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-blue-300 text-lg mb-2">The Refund Gap</h3>
+                        <p class="text-slate-300 leading-relaxed">
+                            Despite consumer protections improving, approximately <strong>60% of parents</strong> 
+                            do not request a refund after an unauthorized charge, often assuming it's their own 
+                            fault or that the process is too difficult.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
 
     </main>
 
     <script>
-        // Common Chart Options
-        const commonOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: { family: "'Inter', sans-serif", size: 12 },
-                        padding: 20
+        // API Configuration
+        const apiKey = ""; // Provided by execution environment
+
+        // Tab Switching Logic
+        const pages = ['refund', 'tips', 'stats'];
+        let chartsInitialized = false;
+
+        function switchTab(activeTab) {
+            // Hide all pages, show active
+            pages.forEach(page => {
+                const el = document.getElementById(`page-${page}`);
+                const btn = document.getElementById(`btn-${page}`);
+                if (page === activeTab) {
+                    el.classList.remove('hidden');
+                    btn.classList.add('active');
+                } else {
+                    el.classList.add('hidden');
+                    btn.classList.remove('active');
+                }
+            });
+
+            // If switching to stats, make sure charts are rendered correctly
+            if (activeTab === 'stats') {
+                setTimeout(() => {
+                    initCharts(); // Re-render or init if needed
+                }, 100);
+            }
+        }
+
+        // Gemini API Helper Function
+        async function callGemini(prompt) {
+            if (!apiKey) {
+                alert("API Key is missing. This feature requires the Gemini API key.");
+                return "Error: API Key missing.";
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                return "Sorry, I encountered an error while processing your request. Please try again.";
+            }
+        }
+
+        // --- AI Feature 1: Refund Letter Generator ---
+        async function generateRefundLetter() {
+            const platform = document.getElementById('platformInput').value;
+            const amount = document.getElementById('amountInput').value;
+            const age = document.getElementById('ageInput').value;
+            const game = document.getElementById('gameInput').value;
+
+            if (!amount || !game) {
+                alert("Please enter the amount and game name.");
+                return;
+            }
+
+            const btn = document.querySelector('button[onclick="generateRefundLetter()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="animate-spin">⌛</span> Generating...`;
+            btn.disabled = true;
+
+            const prompt = `Write a polite but firm formal refund request letter to the ${platform} support team. 
+            The context is that my ${age}-year-old child made unauthorized purchases in the game "${game}" totaling ${amount} without my consent. 
+            Mention that these were unauthorized minor transactions and cite standard consumer protection policies for accidental digital purchases by minors. 
+            Keep it professional and ready to copy-paste. Do not include placeholders like [Your Name] in the body unless necessary, but sign it generally as "A Concerned Parent".`;
+
+            const result = await callGemini(prompt);
+
+            document.getElementById('refundOutput').value = result;
+            document.getElementById('refundOutputContainer').classList.remove('hidden');
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+
+        function copyToClipboard() {
+            const copyText = document.getElementById("refundOutput");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); 
+            document.execCommand("copy");
+            alert("Draft copied to clipboard!");
+        }
+
+        // --- AI Feature 2: Parental Control Assistant ---
+        async function askAssistant() {
+            const query = document.getElementById('assistantQuery').value;
+
+            if (!query) {
+                alert("Please describe what you need help with.");
+                return;
+            }
+
+            const btn = document.querySelector('button[onclick="askAssistant()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="animate-spin">⌛</span> Thinking...`;
+            btn.disabled = true;
+
+            // Show container, hide placeholder
+            document.getElementById('assistantOutputContainer').classList.remove('hidden');
+            document.getElementById('assistantPlaceholder').classList.add('hidden');
+            document.getElementById('assistantOutput').innerText = "Generating instructions specifically for your query...";
+
+            const prompt = `You are an expert on digital parenting and online game safety. 
+            The user asks: "${query}". 
+            Provide clear, step-by-step instructions. If the user asks about a specific device (like iPhone, Android, Xbox, PS5), give specific menu paths (e.g., Settings > Screen Time). 
+            Keep the tone helpful and reassuring. Keep the response concise (under 150 words if possible).`;
+
+            const result = await callGemini(prompt);
+
+            document.getElementById('assistantOutput').innerText = result;
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+
+        // --- Chart.js Initialization ---
+        let charts = {};
+
+        function initCharts() {
+            if (chartsInitialized) return; // Prevent double init
+            
+            // Common Chart Options
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: { family: "'Inter', sans-serif", size: 12 },
+                            padding: 20
+                        }
                     }
                 }
-            }
-        };
+            };
 
-        // 1. Prevalence Chart (Pie)
-        const ctxPrevalence = document.getElementById('prevalenceChart').getContext('2d');
-        new Chart(ctxPrevalence, {
-            type: 'doughnut',
-            data: {
-                labels: ['Unauthorized Purchases (31%)', 'No Unauthorized Spend (69%)'],
-                datasets: [{
-                    data: [31, 69],
-                    backgroundColor: ['#ef4444', '#e2e8f0'],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                ...commonOptions,
-                cutout: '70%',
-                plugins: {
-                    legend: { position: 'bottom' }
+            // 1. Prevalence Chart (Pie)
+            const ctxPrevalence = document.getElementById('prevalenceChart').getContext('2d');
+            charts.prevalence = new Chart(ctxPrevalence, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Unauthorized Purchases (31%)', 'No Unauthorized Spend (69%)'],
+                    datasets: [{
+                        data: [31, 69],
+                        backgroundColor: ['#ef4444', '#e2e8f0'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
                 }
-            }
-        });
+            });
 
-        // 2. Cost Severity (Bar)
-        const ctxCost = document.getElementById('costChart').getContext('2d');
-        new Chart(ctxCost, {
-            type: 'bar',
-            data: {
-                labels: ['Average Incident', 'Severe Cases (Top 19%)'],
-                datasets: [{
-                    label: 'Cost in USD',
-                    data: [170, 300],
-                    backgroundColor: ['#3b82f6', '#1e40af'],
-                    borderRadius: 6,
-                    barPercentage: 0.5
-                }]
-            },
-            options: {
-                ...commonOptions,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { borderDash: [5, 5] },
-                        title: { display: true, text: 'Amount ($)' }
-                    },
-                    x: { grid: { display: false } }
+            // 2. Cost Severity (Bar)
+            const ctxCost = document.getElementById('costChart').getContext('2d');
+            charts.cost = new Chart(ctxCost, {
+                type: 'bar',
+                data: {
+                    labels: ['Average Incident', 'Severe Cases (Top 19%)'],
+                    datasets: [{
+                        label: 'Cost in USD',
+                        data: [170, 300],
+                        backgroundColor: ['#3b82f6', '#1e40af'],
+                        borderRadius: 6,
+                        barPercentage: 0.5
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { borderDash: [5, 5] },
+                            title: { display: true, text: 'Amount ($)' }
+                        },
+                        x: { grid: { display: false } }
+                    }
                 }
-            }
-        });
+            });
 
-        // 3. Settlements (Horizontal Bar)
-        const ctxSettlement = document.getElementById('settlementChart').getContext('2d');
-        new Chart(ctxSettlement, {
-            type: 'bar',
-            data: {
-                labels: ['Google (2014)', 'Apple (2014)', 'Epic Games (2023)'],
-                datasets: [{
-                    label: 'Settlement Amount (Millions USD)',
-                    data: [19, 32.5, 245],
-                    backgroundColor: ['#94a3b8', '#64748b', '#dc2626'],
-                    borderRadius: 4,
-                    indexAxis: 'y'
-                }]
-            },
-            options: {
-                ...commonOptions,
-                indexAxis: 'y',
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: {
-                        grid: { borderDash: [5, 5] },
-                        title: { display: true, text: 'Millions ($)' }
-                    },
-                    y: { grid: { display: false } }
+            // 3. Settlements (Horizontal Bar)
+            const ctxSettlement = document.getElementById('settlementChart').getContext('2d');
+            charts.settlement = new Chart(ctxSettlement, {
+                type: 'bar',
+                data: {
+                    labels: ['Google (2014)', 'Apple (2014)', 'Epic Games (2023)'],
+                    datasets: [{
+                        label: 'Settlement Amount (Millions USD)',
+                        data: [19, 32.5, 245],
+                        backgroundColor: ['#94a3b8', '#64748b', '#dc2626'],
+                        borderRadius: 4,
+                        indexAxis: 'y'
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            grid: { borderDash: [5, 5] },
+                            title: { display: true, text: 'Millions ($)' }
+                        },
+                        y: { grid: { display: false } }
+                    }
                 }
-            }
-        });
+            });
 
-        // 4. Parental Factors (Bar/Mixed)
-        const ctxParental = document.getElementById('parentalChart').getContext('2d');
-        new Chart(ctxParental, {
-            type: 'bar',
-            data: {
-                labels: ['Parents Rarely Check Cards', 'Did Not Request Refund', 'Feel Kids Lack Money Concept'],
-                datasets: [{
-                    label: 'Percentage of Parents (%)',
-                    data: [23, 60, 72],
-                    backgroundColor: ['#f59e0b', '#f97316', '#8b5cf6'],
-                    borderRadius: 6,
-                    barPercentage: 0.6
-                }]
-            },
-            options: {
-                ...commonOptions,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        grid: { borderDash: [5, 5] },
-                        title: { display: true, text: 'Percentage (%)' }
-                    },
-                    x: { grid: { display: false } }
+            // 4. Parental Factors (Bar/Mixed)
+            const ctxParental = document.getElementById('parentalChart').getContext('2d');
+            charts.parental = new Chart(ctxParental, {
+                type: 'bar',
+                data: {
+                    labels: ['Parents Rarely Check Cards', 'Did Not Request Refund', 'Feel Kids Lack Money Concept'],
+                    datasets: [{
+                        label: 'Percentage of Parents (%)',
+                        data: [23, 60, 72],
+                        backgroundColor: ['#f59e0b', '#f97316', '#8b5cf6'],
+                        borderRadius: 6,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { borderDash: [5, 5] },
+                            title: { display: true, text: 'Percentage (%)' }
+                        },
+                        x: { grid: { display: false } }
+                    }
                 }
-            }
-        });
+            });
+
+            chartsInitialized = true;
+        }
     </script>
 </body>
 </html>
